@@ -23,8 +23,6 @@ class Monitor():
                     if isinstance(pid, int) and pid > 0 and psutil.pid_exists(pid)
                 ]
 
-            ## Reverse Shell
-            ## Please check if the appliaction that was terminate is not your appliaction.. Because sometimes it can get wrong. Add to processes_suspicious to skip those appliaction
             try:
                 for connection in psutil.net_connections(kind="tcp"):
                     if connection.status != 'ESTABLISHED':
@@ -142,7 +140,6 @@ class Monitor():
                                     if "--headless" in child_cmd or "token" in command_line:
                                         kill = True
                         elif process_name in skip_browsers:
-                            #TODO Check if brower being injected
                             for child in process.children():
                                 if child.name().lower() in ["cmd.exe", "powershell.exe"]:
                                     kill = True
@@ -223,7 +220,7 @@ class Monitor():
         #shortcut
         workers = [
             (self.RevereShellWorker, "ReverseShell Worker", (self.alerted,)),
-            (self.RemoteDesktopWorker, "RemoteDesktop Worker", ())
+            #(self.RemoteDesktopWorker, "RemoteDesktop Worker", ())
         ]
 
         """
