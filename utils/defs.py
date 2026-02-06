@@ -85,14 +85,3 @@ def is_private_ip(ip: str) -> bool:
         )
     except ValueError:
         return False
-
-    if pid is None:
-        return False
-
-    if not isinstance(pid, int):
-        return False
-
-    if pid <= 0:
-        return False
-
-    return psutil.pid_exists(pid)
