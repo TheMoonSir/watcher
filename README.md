@@ -28,7 +28,7 @@ Note: Remote desktop is still not ready yet so you can't you use it for now.
 
 1. git clone the project to where you want
 2. cd project folder
-3. Install requirements.txt - (pip -r install requirements.txt)
+3. Install requirements.txt | ```pip install -r requirements.txt```
 4. Open Command prompt as admin
 5. Use Path where the project is
 6. py main.py
