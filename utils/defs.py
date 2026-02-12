@@ -1,24 +1,6 @@
-import win32evtlog
-import time
-import logging
-import os
-import getpass
-import psutil
-import ipaddress
-import re
-import multiprocessing
-import threading
-import subprocess
-import ctypes
-from ctypes import wintypes
-import re
-import struct
-import winreg
-import traceback
-from collections import defaultdict
-from utils.ReadWriteMemory import ReadWriteMemory, ReadWriteMemoryError
-from utils.ScanMemory import ScanMemory
+# Deleted all imported modules because they are not used in this file and it is just a definitions file (I dont know why i put those imports here in the first place XD)
 
+import getpass
 
 
 current_user = getpass.getuser()
@@ -41,14 +23,7 @@ EVENT_DESCRIPTIONS = [
     "User initiated logoff",
     "The Desktop Window Manager has exited with code"
 ]
-processes_suspicious = [
-    "powershell.exe",
-    "cmd.exe",
-    "wscript.exe",
-    "cscript.exe",
-    "python.exe",
-    "mshta.exe"
-]
+
 
 skip_browsers = ["msedge.exe", "chrome.exe", "firefox.exe", "brave.exe"] ## Bruh.
 
@@ -60,6 +35,8 @@ skip_paths = [
 ]
 
 commands_suspicious = [
+    "conpty",
+    "rawui"
     "-enc",
     "-nop",
     "-w hidden",
@@ -67,32 +44,3 @@ commands_suspicious = [
 ]
 
 python_commands_suspicious = ["socket", "subprocess", "connect", "sp.PIPE"]
-
-MAX_DWORD = 0xFFFFFFFF
-
-
-
-# Functions
-def is_private_ip(ip: str) -> bool:
-    try:
-        addr = ipaddress.ip_address(ip)
-        return (
-            addr.is_private or
-            addr.is_loopback or
-            addr.is_link_local or
-            addr.is_reserved or
-            addr.is_multicast
-        )
-    except ValueError:
-        return False
-
-    if pid is None:
-        return False
-
-    if not isinstance(pid, int):
-        return False
-
-    if pid <= 0:
-        return False
-
-    return psutil.pid_exists(pid)
