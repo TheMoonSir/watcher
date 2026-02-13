@@ -21,7 +21,7 @@ class Network:
         except ValueError:
             return False
         
-    def get_connections(self):
+    def get_connections():
         for connection in psutil.net_connections(kind='tcp'):
             if connection.status != 'ESTABLISHED':
                 continue

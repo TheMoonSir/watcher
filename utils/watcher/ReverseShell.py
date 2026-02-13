@@ -7,6 +7,7 @@ import platform
 
 
 from utils.alert.notifier import AlertManager
+from utils.memory import ScanMemory
 from utils.network.network import Network
 from utils.process.process import Process
 
@@ -47,6 +48,7 @@ class RerverseShell():
 
                         # Won't kill the process that highly risky because shellcode injection already killing it
                         if reason != "highly risky":
+                            ScanMemory(appliaction.pid)._disconnect()
                             appliaction.kill()
             except Exception as e:
                     print(f"Error happend in worker [{threading.current_thread().name}] - {e}")
@@ -98,4 +100,6 @@ class RerverseShell():
             target = self.ReverseShellWorkerLinux
 
         threading.Thread(target=target, name=name, daemon=True).start()
+
+
 

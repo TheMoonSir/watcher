@@ -1,8 +1,10 @@
 # This file is for checking process for suspicious behavior
+import os
 import platform
 import psutil
-from utils.certificate.check_cert import verify_microsft
-from utils.memory.ScanMemory import ScanMemory
+if platform.system() == "Windows":
+    from utils.certificate.check_cert import verify_microsft
+    from utils.memory.ScanMemory import ScanMemory
 from utils.defs import skip_paths, skip_browsers, python_commands_suspicious, commands_suspicious, linux_commands_suspicious, linux_python_suspicious
 
 class Process:
@@ -44,8 +46,7 @@ class Process:
             return True, "highly risky"
         
         # Check if the process is signed by microsoft and if the path is in the skip list (Won't whitelist if the process is in skip list but not signed by microsoft)
-        check_path = any(self.info["exe"].startswith(path.lower()) for path in skip_paths)
-
+        check_path = any(self.info["exe"].startswith(path.lower()) for path in skip_paths if path)
         # Waring: The verify_microsft is huge file the paython may load slower but will keep checking the certificate the process
         check_sign = verify_microsft(self.info["exe"])
 
@@ -93,7 +94,18 @@ class Process:
         
     def check_process_linux(self) -> bool:
         if self.process is None:
+            print(f"Process with PID {self.pid} does not exist or access denied.")
             return False, "not risky"
+        
+        try:
+            for fd in [0, 1]:
+                fd_path = f"/proc/{self.pid}/fd/{fd}"
+                if os.path.exists(fd_path):
+                    target = os.readlink(fd_path)
+                    if "socket:[" in target:
+                        return True, "highly risky"
+        except (PermissionError, FileNotFoundError):
+            pass
         
         if any(cmd in self.info["cmdline"] for cmd in linux_commands_suspicious):
             return True, "highly risky"
@@ -101,6 +113,10 @@ class Process:
         if "python" in self.info["name"]:
             if any(cmd in self.info["cmdline"] for cmd in linux_python_suspicious):
                 return True, "highly risky"
+            
+        print(f"Process {self.info['name']} with cmdline {self.info['cmdline']} is not risky")
+            
+        return False, "not risky"
 
     def kill(self):
         if self.process is not None:

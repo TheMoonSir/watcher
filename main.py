@@ -4,11 +4,7 @@ import platform
 from utils.watcher import RerverseShell
 
 
-if __name__ == "__main__":
-    if platform.system() != "Windows":
-        print("This program is designed to run on Windows.")
-        exit(1)
-    
+if __name__ == "__main__":    
     logging.basicConfig(filename='Monitor.log', level=logging.INFO, format='%(asctime)s - %(message)s')
 
     RerverseShell().initialize()
