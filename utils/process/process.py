@@ -1,7 +1,8 @@
 # This file is for checking process for suspicious behavior
 import psutil
 from utils.certificate.check_cert import verify_microsft
-from utils.defs import ScanMemory, skip_paths, python_commands_suspicious, commands_suspicious, skip_browsers, processes_suspicious
+from utils.memory.ScanMemory import ScanMemory
+from utils.defs import skip_paths, skip_browsers, python_commands_suspicious, commands_suspicious
 
 class Process:
     def __init__(self, pid: int):
@@ -42,17 +43,17 @@ class Process:
         check_sign = verify_microsft(self.info["exe"])
 
         if not check_path and not check_sign:
-            return True, "highly risky"
+            return True, "normal risky"
                 
         if "python" in self.info["name"]:
             check_command = any(key in self.info["cmdline"] for key in python_commands_suspicious) or ("-c" in self.info["cmdline"] or "exec(" in self.info["cmdline"])
 
             if check_command:
-                return True, "highly risky"
+                return True, "normal risky"
             else:
                 for child in self.process.children(recursive=True):
                     if child.name().lower() in ["cmd.exe", "powershell.exe", "sh", "bash"]:
-                        return True, "highly risky"
+                        return True, "normal risky"
                     
         elif "powershell" in self.info["name"]:
             found, _ = ScanMemory(self.process.pid).ScanShellcode()
@@ -62,19 +63,19 @@ class Process:
             
             check_command_suspicious = any(key in self.info["cmdline"] for key in commands_suspicious)
             if check_command_suspicious:
-                return True, "highly risky"
+                return True, "normal risky"
             
             # Checking if using PayloadsAlltheThings method powershell execution
             for child in self.process.children(recursive=True):
                 if child.name().lower() == "conhost.exe":
                     child_command = " ".join(child.cmdline()).lower()
                     if "--headless" in child_command or "token" in child_command:
-                        return True, "highly risky"
+                        return True, "normal risky"
                     
         #TODO: Check if open image is not making reverse shell (image.png --image open reverse shell)
         #TODO: Check if the process is using some kind of obfuscation (like renaming cmd.exe to something else) - But will cause false positive a little bit
 
-        if self.info[0] in skip_browsers:
+        if self.info["name"] in skip_browsers:
             found, _ = ScanMemory(self.process.pid).ScanShellcode()
 
             if found:

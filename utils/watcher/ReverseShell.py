@@ -1,4 +1,4 @@
-from defs import *
+from utils.defs import current_user
 import os
 import threading
 import time
@@ -32,12 +32,12 @@ class RerverseShell():
                     if is_suspicious:
                         result = {
                             'message': 'Security action found',
-                            'computer': {self.computer_name},
-                            'time': {time.ctime()},
-                            'process_name': {appliaction.info["name"]},
-                            'process_path': {appliaction.info["exe"]},
-                            'process_id': {appliaction.pid},
-                            'remote_ip': {connection.raddr.ip}
+                            'computer': self.computer_name,
+                            'time': time.ctime(),
+                            'process_name': appliaction.info["name"],
+                            'process_path': appliaction.info["exe"],
+                            'process_id': appliaction.pid,
+                            'remote_ip': connection.raddr.ip
                         }
 
                         severity = "high" if reason == "highly risky" else "normal"

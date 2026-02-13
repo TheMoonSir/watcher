@@ -1,8 +1,9 @@
-from utils.defs import *
 import ctypes
 from ctypes import wintypes
 import re
 import struct
+
+from .ReadWriteMemory import ReadWriteMemory
 
 MEM_RELEASE = 0x8000
 MEM_COMMIT = 0x1000
