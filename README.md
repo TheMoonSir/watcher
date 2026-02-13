@@ -1,14 +1,9 @@
 # Anti Reverse Shell / Remote Desktop Monitor
 
-<img src="https://i.postimg.cc/R0HYvT6W/5Srg-PWU.png" />
+Hello my name is themoon (also known shalev), i made this project for people that using Servers with lower secuity.
+You can use the project to be protect from attackers that reverse shell your computer.
 
-Hello my name is themoon (also known shalev), i created this project to help people who run servers with lower security.
-You can use this project to protect your computer from attackers who may try to reverse shell your computer or remote desktop access without your permission.
-
-# Informations on this project
-
-### You can view how this porject work here
-https://miro.com/app/board/uXjVGAn3Ml8=/?share_link_id=431140843238
+# Informations on this projects
 
 ### Reverse Shell
 - Detect suspicious processes and command execution
@@ -18,11 +13,12 @@ https://miro.com/app/board/uXjVGAn3Ml8=/?share_link_id=431140843238
 ### Remote Desktop
 - Detect any action by Windows Security Event Logs (only way to detect)
 - Log all actions that found
-- Will Come soon
+
+Note: Remote desktop is still not ready yet so you can't you use it for now.
 
 ### OS support
-- Windows users
-- Linux
+- Windows users (currently)
+- Linux (coming soon)
 
 # Requirements
 1. You need 3.12.4 verison python
@@ -32,14 +28,28 @@ https://miro.com/app/board/uXjVGAn3Ml8=/?share_link_id=431140843238
 
 1. git clone the project to where you want
 2. cd project folder
-3. Install requirements.txt | ```pip install -r requirements.txt```
+3. Install requirements.txt - (pip -r install requirements.txt)
 4. Open Command prompt as admin
 5. Use Path where the project is
 6. py main.py
 
 # Warning
+Some programs might be detected as suspicious.
+If this happens, you can whitelist them inside on utils/defs.py:
+
+```python
+processes_suspicious = [
+    "powershell.exe",
+    "cmd.exe",
+    "wscript.exe",
+    "cscript.exe",
+    "python.exe",
+    "mshta.exe"
+]
+```
+
 The project does not ignore private IP connections.  
-If you want to skip private IP, remove the comment from inside on network/network.py this code:
+If you want to skip private IP, remove the comment from this code:
 
 ```python
 """
