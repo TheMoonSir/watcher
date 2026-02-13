@@ -1,8 +1,9 @@
 # This file is for checking process for suspicious behavior
+import platform
 import psutil
 from utils.certificate.check_cert import verify_microsft
 from utils.memory.ScanMemory import ScanMemory
-from utils.defs import skip_paths, skip_browsers, python_commands_suspicious, commands_suspicious
+from utils.defs import skip_paths, skip_browsers, python_commands_suspicious, commands_suspicious, linux_commands_suspicious, linux_python_suspicious
 
 class Process:
     def __init__(self, pid: int):
@@ -27,6 +28,12 @@ class Process:
         return self.info
 
     def check_process(self) -> bool:
+        if platform.system() == "Windows":
+            return self.check_process_windows()
+        else:
+            return self.check_process_linux()
+
+    def check_process_windows(self) -> bool:
         if self.process is None:
             return False, "not risky"
 
@@ -84,7 +91,17 @@ class Process:
         
         return False, "not risky"
         
-    
+    def check_process_linux(self) -> bool:
+        if self.process is None:
+            return False, "not risky"
+        
+        if any(cmd in self.info["cmdline"] for cmd in linux_commands_suspicious):
+            return True, "highly risky"
+        
+        if "python" in self.info["name"]:
+            if any(cmd in self.info["cmdline"] for cmd in linux_python_suspicious):
+                return True, "highly risky"
+
     def kill(self):
         if self.process is not None:
             try:

@@ -44,3 +44,26 @@ commands_suspicious = [
 ]
 
 python_commands_suspicious = ["socket", "subprocess", "connect", "sp.PIPE"]
+
+
+# Linux verison 
+
+linux_commands_suspicious = [
+    "-lvp",
+    "-lvnp",
+    "-lvrp",
+    "-e /bin/sh",
+    "-e /bin/bash",
+    "dev/tcp/",
+    "dev/udp/",
+    "mkfifo",
+    "socat exec",
+    "pty,link"
+]
+
+linux_python_suspicious = [
+    "pty.spawn",
+    "os.dup2",
+    "resource.setrlimit",
+    "os.execl('/bin/sh'"
+]
