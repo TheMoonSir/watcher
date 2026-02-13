@@ -9,8 +9,6 @@ if __name__ == "__main__":
 
     RerverseShell().initialize()
 
-
-
     try:
         while True:
             time.sleep(1)

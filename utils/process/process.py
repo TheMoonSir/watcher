@@ -97,25 +97,14 @@ class Process:
             print(f"Process with PID {self.pid} does not exist or access denied.")
             return False, "not risky"
         
-        try:
-            for fd in [0, 1]:
-                fd_path = f"/proc/{self.pid}/fd/{fd}"
-                if os.path.exists(fd_path):
-                    target = os.readlink(fd_path)
-                    if "socket:[" in target:
-                        return True, "highly risky"
-        except (PermissionError, FileNotFoundError):
-            pass
         
         if any(cmd in self.info["cmdline"] for cmd in linux_commands_suspicious):
             return True, "highly risky"
         
         if "python" in self.info["name"]:
-            if any(cmd in self.info["cmdline"] for cmd in linux_python_suspicious):
+            if any(cmd in self.info["cmdline"] for cmd in linux_python_suspicious) or any(cmd in self.info["cmdline"] for cmd in python_commands_suspicious):
                 return True, "highly risky"
-            
-        print(f"Process {self.info['name']} with cmdline {self.info['cmdline']} is not risky")
-            
+                        
         return False, "not risky"
 
     def kill(self):
