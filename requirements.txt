@@ -1,2 +1,4 @@
-pywin32
-PythonForWindows
+pywin32; sys_platform == 'win32'
+PythonForWindows; sys_platform == 'win32'
+
+psutil

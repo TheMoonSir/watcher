@@ -208,7 +208,7 @@ def verify_microsft(filename):
         for _, cert in crypto_obj.signers_and_certs:            
             if "Microsoft" in cert.name:
                 return True      
-    except Exception:
-        pass
+    except Exception as e:
+        return False
 
     return False
