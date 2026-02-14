@@ -6,6 +6,7 @@ import sys
 import shutil
 import uuid
 import requests
+import psutil
 from packaging import version
 from dotenv import load_dotenv
 from resend import api_url
@@ -26,14 +27,14 @@ class Watcher:
             releases = response.json()
 
             if len(releases) == 0 or not isinstance(releases, list):
-                print(f" [{Fore.RED}𐄂{Style.RESET_ALL}] no releases found.")
+                print(f" [{Fore.RED}✗{Style.RESET_ALL}] no releases found.")
                 return
             
             release = releases[0]
             get_tag = release.get('tag_name', '0')
 
             if get_tag == '0':
-                print(f" [{Fore.RED}𐄂{Style.RESET_ALL}] no tag found in release.")
+                print(f" [{Fore.RED}✗{Style.RESET_ALL}] no tag found in release.")
                 return
 
             clean_version = get_tag.lstrip('v')
@@ -46,6 +47,7 @@ class Watcher:
                 print(f" [{Fore.YELLOW}⚠{Style.RESET_ALL}] new verison available, do you want to update? (y/n)")
                 choice = input().lower()
                 if choice == 'y':
+                    os.system("title Watcher - updating")
                     exe = sys.executable
                     path = os.path.dirname(exe)
                     
@@ -54,7 +56,7 @@ class Watcher:
 
                     assets = release.get('assets', [])
                     if not assets:
-                        print(f" [{Fore.RED}𐄂{Style.RESET_ALL}] Couldn't update, no assets found.")
+                        print(f" [{Fore.RED}✗{Style.RESET_ALL}] Couldn't update, no assets found.")
                         return
                     
                     url = assets[0]['browser_download_url']
@@ -73,19 +75,21 @@ class Watcher:
                                     spinner_index += 1
                             
                     except requests.RequestException as e:
-                        print(f"[{Fore.RED}𐄂{Style.RESET_ALL}] Couldn't download update: {e}")
+                        print(f"[{Fore.RED}✗{Style.RESET_ALL}] Couldn't download update: {e}")
                         return
 
+                    os.system("title Watcher - restarting")
                     print(f"\b [{Fore.GREEN}✓{Style.RESET_ALL}] Installed update done. closing current process for update.")
 
                     cmd = f'cmd /c "timeout /t 2 >nul & move /y "{temp}" "{exe}" >nul & start "" "{exe}" & exit"'
                     subprocess.Popen(cmd, creationflags=subprocess.CREATE_NO_WINDOW)
 
                     sys.exit()
+                    psutil.Process(os.getpid()).kill()
             else:
                 print(f" [{Fore.YELLOW}⚠{Style.RESET_ALL}] already up to date.")
         except requests.RequestException as e:
-            print(f" [{Fore.RED}𐄂{Style.RESET_ALL}] Could not check for updates: {e}")
+            print(f" [{Fore.RED}✗{Style.RESET_ALL}] Could not check for updates: {e}")
 
 
     def ensure_watcher(self):
@@ -98,7 +102,7 @@ class Watcher:
         name = "watcher"
 
         if os.path.basename(current_dir).lower() != name:
-            target = os.path.join(os.path.dirname(current_dir), name)
+            target = os.path.join(current_dir, name)
 
             if not os.path.exists(target):
                 os.makedirs(target)
@@ -112,19 +116,25 @@ class Watcher:
             print(f"\b [{Fore.GREEN}✓{Style.RESET_ALL}] Moved to {target} and restarted.")
             
             sys.exit()
+            psutil.Process(os.getpid()).kill()
         
+        os.system("title Watcher - running")
         print(f"\b [{Fore.GREEN}✓{Style.RESET_ALL}] Running from correct location.")
         os.chdir(current_dir)
 
     def initialize(self):
+        os.system("title Watcher - initializing")
         try:
             is_admin = os.getuid() == 0
         except AttributeError:
             is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
 
         if not is_admin:
-            print(f"[{Fore.RED}𐄂{Style.RESET_ALL}] This script requires administrative privileges, please run as administrator/root.")
-            sys.exit(1)
+            os.system("title Watcher - administrative privileges required")
+            print(f"[{Fore.RED}✗{Style.RESET_ALL}] This script requires administrative privileges, please run as administrator/root.")
+            input("Press Enter to exit...")
+            sys.exit()
+            
 
         self.ensure_watcher()
         self.check_update()
