@@ -46,11 +46,11 @@ class Process:
             return True, "highly risky"
         
         # Check if the process is signed by microsoft and if the path is in the skip list (Won't whitelist if the process is in skip list but not signed by microsoft)
-        check_path = any(self.info["exe"].startswith(path.lower()) for path in skip_paths if path)
+        check_path = any(self.info["exe"].lower().startswith(path.lower()) for path in skip_paths)
         # Waring: The verify_microsft is huge file the paython may load slower but will keep checking the certificate the process
         check_sign = verify_microsft(self.info["exe"])
 
-        if not check_path and not check_sign:
+        if check_path and not check_sign:
             return True, "normal risky"
                 
         if "python" in self.info["name"]:

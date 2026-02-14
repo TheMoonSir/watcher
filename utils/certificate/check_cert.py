@@ -200,15 +200,29 @@ def is_signed(filename):
 
 def verify_microsft(filename):
     if not is_signed(filename):
+        print(f"Detecting unsigned process: {filename}")
         return False
     
     try:
-        crypto_obj = CryptObject(filename)
-
-        for _, cert in crypto_obj.signers_and_certs:            
-            if "Microsoft" in cert.name:
-                return True      
+        try:
+            crypto_obj = CryptObject(filename)
+            for _, cert in crypto_obj.signers_and_certs:            
+                if "Microsoft" in cert.name or "Microsoft" in cert.issuer:
+                    return True   
+        except Exception as cert_error:
+            if '2148081673' in str(cert_error):
+                pass
+            pass
+            
+        catlog = get_catalog_for_filename(filename)
+        if catlog:
+            if "Microsoft" in catlog or "UserExperience" in catlog:
+                return True
     except Exception as e:
+        if '2148081673' in str(e):
+            pass
+        else:
+            print(f"Error cert for {filename}: {e}")
         return False
 
     return False

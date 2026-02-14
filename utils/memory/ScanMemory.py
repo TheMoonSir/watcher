@@ -43,6 +43,8 @@ class MEMORY_BASIC_INFORMATION(ctypes.Structure):
 class ScanMemory:
     def __init__(self, pid=None):
         # going mad for this anyways use -1 pid which shouldn't work
+        self.kernel32 = ctypes.windll.kernel32
+        self.iphlpapi = ctypes.windll.iphlpapi
         if not isinstance(pid, int) or pid <= 0:
             self.pid = None
             self.process = None
@@ -52,8 +54,6 @@ class ScanMemory:
         self.process = self.rwm.get_process_by_id(self.pid)
         if not self.process:
             return
-        self.kernel32 = ctypes.windll.kernel32
-        self.iphlpapi = ctypes.windll.iphlpapi
         
 
         ## Fixed Issue "int too long to covert"
@@ -75,6 +75,8 @@ class ScanMemory:
         ]
 
     def _disconnect(self):
+        if not hasattr(self, 'iphlpapi') or self.iphlpapi is None:
+            return False
         size = wintypes.DWORD(0)
         self.iphlpapi.GetExtendedTcpTable(None, ctypes.byref(size), True, 2, TCP_TABLE_OWNER_PID_ALL, 0)
         buffer = ctypes.create_string_buffer(size.value)

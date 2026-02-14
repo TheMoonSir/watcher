@@ -4,6 +4,8 @@ import getpass
 
 
 current_user = getpass.getuser()
+repo = "TheMoonSir/watcher"
+api_url = f"https://api.github.com/repos/{repo}/releases"
 server = 'localhost'
 type = 'Security'
 EVENT_IDS = [4624, 4625, 21, 22, 24, 25, 39, 4778, 4779, 23, 4634, 4647, 9009]
@@ -30,8 +32,7 @@ skip_browsers = ["msedge.exe", "chrome.exe", "firefox.exe", "brave.exe"] ## Bruh
 skip_paths = [
     r"c:\windows",
     r"c:\windows\system32",
-    r"c:\windows\systemapps",
-    r""
+    r"c:\windows\systemapps"
 ]
 
 commands_suspicious = [
@@ -67,3 +68,12 @@ linux_python_suspicious = [
     "resource.setrlimit",
     "os.execl('/bin/sh'"
 ]
+
+# Custom loading
+spinner = ["|", "/", "-", "\\"]
+spinner_index = 0
+
+"""
+print(f"\b{spinner[spinner_index % 4]}", end="", flush=True)
+spinner_index += 1
+"""
