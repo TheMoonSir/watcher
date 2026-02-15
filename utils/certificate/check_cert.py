@@ -200,7 +200,6 @@ def is_signed(filename):
 
 def verify_microsft(filename):
     if not is_signed(filename):
-        print(f"Detecting unsigned process: {filename}")
         return False
     
     try:
