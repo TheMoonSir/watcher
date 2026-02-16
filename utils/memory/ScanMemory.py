@@ -113,35 +113,38 @@ class ScanMemory:
             if not self.kernel32.VirtualQueryEx(self.process.handle, ctypes.c_void_p(addr), ctypes.byref(mbi), ctypes.sizeof(mbi)):
                 break
 
-            if mbi.State == MEM_COMMIT and (mbi.Protect & PAGE_EXECUTE_READWRITE):
-                buffer = ctypes.create_string_buffer(mbi.RegionSize)
-                n_read = ctypes.c_size_t(0)
-                
-                if self.kernel32.ReadProcessMemory(self.process.handle, mbi.BaseAddress, buffer, mbi.RegionSize, ctypes.byref(n_read)):
-                    if any(p.search(buffer.raw) for p in Shellcode):
-                        detected = True
+            if mbi.State == MEM_COMMIT:
+                if mbi.Protect == PAGE_EXECUTE_READ:
+                    buffer = ctypes.create_string_buffer(mbi.RegionSize)
+                    n_read = ctypes.c_size_t(0)
+                    
+                    if self.kernel32.ReadProcessMemory(self.process.handle, mbi.BaseAddress, buffer, mbi.RegionSize, ctypes.byref(n_read)):
+                        if any(p.search(buffer.raw) for p in Shellcode):
+                            detected = True
+                            
+                            # Wipe memory
+                            zero_fill = b'\x00' * mbi.RegionSize
+                            self.kernel32.WriteProcessMemory(self.process.handle, mbi.BaseAddress, zero_fill, mbi.RegionSize, None)
+                            
+                            # Attempt to free the region
+                            self.kernel32.VirtualFreeEx(self.process.handle, mbi.BaseAddress, 0, MEM_RELEASE)
+                            break
                         
-                        # Wipe memory
-                        zero_fill = b'\x00' * mbi.RegionSize
-                        self.kernel32.WriteProcessMemory(self.process.handle, mbi.BaseAddress, zero_fill, mbi.RegionSize, None)
-                        
-                        # Attempt to free the region
-                        self.kernel32.VirtualFreeEx(self.process.handle, mbi.BaseAddress, 0, MEM_RELEASE)
-                             
-            elif mbi.State == MEM_COMMIT and mbi.Type == MEM_PRIVATE and (mbi.Protect in [PAGE_EXECUTE_READWRITE, PAGE_EXECUTE_READ]):
-                buffer = ctypes.create_string_buffer(mbi.RegionSize)
-                n_read = ctypes.c_size_t(0)
-
-                if self.kernel32.ReadProcessMemory(self.process.handle, mbi.BaseAddress, buffer, mbi.RegionSize, ctypes.byref(n_read)): 
-                    if any(p.search(buffer.raw) for p in Shellcode):
-                        detected = True
-
-                        # Wipe memory
-                        zero_fill = b'\x00' * mbi.RegionSize
-                        self.kernel32.WriteProcessMemory(self.process.handle, mbi.BaseAddress, zero_fill, mbi.RegionSize, None)
-                        
-                        # Attempt to free the region
-                        self.kernel32.VirtualFreeEx(self.process.handle, mbi.BaseAddress, 0, MEM_RELEASE)
+                elif mbi.Type == MEM_PRIVATE and (mbi.Protect & PAGE_EXECUTE_READWRITE):
+                    buffer = ctypes.create_string_buffer(mbi.RegionSize)
+                    n_read = ctypes.c_size_t(0)
+                    
+                    if self.kernel32.ReadProcessMemory(self.process.handle, mbi.BaseAddress, buffer, mbi.RegionSize, ctypes.byref(n_read)):
+                        if any(p.search(buffer.raw) for p in Shellcode):
+                            detected = True
+                            
+                            # Wipe memory
+                            zero_fill = b'\x00' * mbi.RegionSize
+                            self.kernel32.WriteProcessMemory(self.process.handle, mbi.BaseAddress, zero_fill, mbi.RegionSize, None)
+                            
+                            # Attempt to free the region
+                            self.kernel32.VirtualFreeEx(self.process.handle, mbi.BaseAddress, 0, MEM_RELEASE)
+                            break
             
             addr += mbi.RegionSize
 

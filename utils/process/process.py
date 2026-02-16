@@ -38,12 +38,6 @@ class Process:
     def check_process_windows(self) -> bool:
         if self.process is None:
             return False, "not risky"
-
-        # Check if the process being injected
-        found, _ = ScanMemory(self.process.pid).ScanShellcode()
-        
-        if found:
-            return True, "highly risky"
         
         # Check if the process is signed by microsoft and if the path is in the skip list (Won't whitelist if the process is in skip list but not signed by microsoft)
         check_path = any(self.info["exe"].lower().startswith(path.lower()) for path in skip_paths)
@@ -88,6 +82,12 @@ class Process:
 
             if found:
                 return True, "highly risky"
+            
+        # Check if the process being injected
+        found, _ = ScanMemory(self.process.pid).ScanShellcode()
+        
+        if found:
+            return True, "highly risky"
 
         
         return False, "not risky"
