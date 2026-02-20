@@ -1,0 +1,1 @@
+from .check_cert import verify_microsft
