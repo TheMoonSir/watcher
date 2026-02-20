@@ -1,9 +1,9 @@
-# Anti Reverse Shell / Remote Desktop Monitor
+# Anti Reverse Shell
 
 <img src="https://i.postimg.cc/R0HYvT6W/5Srg-PWU.png" />
 
 Hello my name is themoon (also known shalev), i created this project to help people who run servers with lower security.
-You can use this project to protect your computer from attackers who may try to reverse shell your computer or remote desktop access without your permission.
+You can use this project to protect your computer from attackers who may try to reverse shell your computer
 
 # Informations on this project
 
@@ -14,11 +14,6 @@ https://miro.com/app/board/uXjVGAn3Ml8=/?share_link_id=431140843238
 - Detect suspicious processes and command execution
 - Scan process memory for detect shellcode injection model
 - Logging all actions that found
-
-### Remote Desktop
-- Detect any action by Windows Security Event Logs (only way to detect)
-- Log all actions that found
-- Will Come soon
 
 ### OS support
 - Windows users

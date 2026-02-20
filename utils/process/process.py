@@ -46,7 +46,7 @@ class Process:
 
         if check_path and not check_sign:
             return True, "normal risky"
-                
+               
         if "python" in self.info["name"]:
             check_command = any(key in self.info["cmdline"] for key in python_commands_suspicious) or ("-c" in self.info["cmdline"] or "exec(" in self.info["cmdline"])
 
@@ -74,8 +74,6 @@ class Process:
                     if "--headless" in child_command or "token" in child_command:
                         return True, "normal risky"
                     
-        #TODO: Check if open image is not making reverse shell (image.png --image open reverse shell)
-        #TODO: Check if the process is using some kind of obfuscation (like renaming cmd.exe to something else) - But will cause false positive a little bit
 
         if self.info["name"] in skip_browsers:
             found, _ = ScanMemory(self.process.pid).ScanShellcode()
